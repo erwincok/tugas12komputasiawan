@@ -7,19 +7,20 @@ from functools import wraps
 import sqlite3
 from werkzeug.security import generate_password_hash, check_password_hash
 import re
+import os
 
-
+basedir = os.path.abspath(os.path.dirname(__file__))
 app = Flask(__name__)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///students.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'students.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'rayapbesi'
 
-
+db_path = os.path.join(basedir, 'students.db')
 csrf = CSRFProtect(app) # mengaktifkan CSRF Protection
 db = SQLAlchemy(app)
 
@@ -112,7 +113,8 @@ def add_student():
         return "Grade tidak valid.", 400
 
 
-    connection = sqlite3.connect('instance/students.db')
+    connection = sqlite3.connect(db_path)
+    # connection = sqlite3.connect('instance/students.db')
     cursor = connection.cursor()
 
     # RAW Query
